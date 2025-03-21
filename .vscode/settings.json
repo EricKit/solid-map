@@ -1,0 +1,4 @@
+{
+  // Default (format when you save)
+  "editor.formatOnSave": true
+}
