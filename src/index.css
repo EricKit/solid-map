@@ -1,10 +1,33 @@
 @import "tailwindcss";
 
+@theme {
+  --color-primary: var(--color-gray-800);
+  --color-primary-light: var(--color-gray-500);
+  --color-primary-dark: var(--color-gray-900);
+  --color-secondary: var(--color-teal-700);
+  --color-secondary-light: var(--color-teal-500);
+  --color-secondary-dark: var(--color-teal-900);
+  --color-danger: var(--color-red-700);
+  --color-success: var(--color-green-700);
+  --color-warn: var(--color-yellow-700);
+  --color-off-white: var(--color-gray-200);
+
+  --color-on-primary: var(--color-gray-200);
+  --color-muted-on-primary: var(--color-gray-500);
+  --color-on-danger: var(--color-red-200);
+  --color-on-secondary: var(--color-teal-200);
+  --color-muted: var(--color-gray-700);
+
+  --font-sans: InterVariable, sans-serif;
+}
+
 body {
   margin: 0;
   font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
-    "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+    "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  color: var(--color-primary-dark);
 }

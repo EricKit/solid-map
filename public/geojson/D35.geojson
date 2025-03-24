@@ -1,0 +1,19 @@
+{
+  "type": "FeatureCollection",
+  "name": "D35",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [12.45, 44.5],
+          [13.4, 44.5],
+          [14.9, 43.4],
+          [13.5, 43.4],
+          [12.45, 44.5]
+        ]
+      }
+    }
+  ]
+}
