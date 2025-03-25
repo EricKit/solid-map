@@ -26,6 +26,7 @@
   "dependencies": {
     "@arcgis/core": "^4.32.9",
     "@modular-forms/solid": "^0.25.1",
+    "@solidjs/router": "^0.15.3",
     "@tailwindcss/vite": "^4.0.15",
     "solid-icons": "^1.1.0",
     "solid-js": "^1.9.5",
