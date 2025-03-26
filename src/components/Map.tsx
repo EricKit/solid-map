@@ -94,7 +94,11 @@ const Map: Component = () => {
 
   return (
     <div class="w-full h-192">
-      <div ref={mapDiv} class="p-0 m-0 w-full h-[calc(100%-2rem)]" on:mousemove={onMouseMove}></div>
+      {/* <div ref={mapDiv} class="p-0 m-0 w-full h-[calc(100%-2rem)]" on:mousemove={onMouseMove}></div> */}
+      <div ref={mapDiv} class="p-0 m-0 w-full h-[calc(100%-2rem)]">
+        {" "}
+      </div>
+
       <BottomBar mouseCoordinate={mouseCoordinate() ?? new Coordinate("N0 E0")}></BottomBar>
     </div>
   );
