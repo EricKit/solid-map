@@ -1,11 +1,17 @@
-import { onMount, type Component } from "solid-js";
+import { createSignal, onMount, type Component } from "solid-js";
 import ArcGISMap from "@arcgis/core/Map.js";
 import MapView from "@arcgis/core/views/MapView.js";
 import GeoJSONLayer from "@arcgis/core/layers/GeoJSONLayer";
 import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
 import SimpleRenderer from "@arcgis/core/renderers/SimpleRenderer";
+import { BottomBar } from "./map/BottomBar";
+import Coordinate from "../models/coordinate";
 
 const Map: Component = () => {
+  const [mouseCoordinate, setMouseCoordinate] = createSignal<Coordinate>();
+
+  let view: MapView | undefined = undefined;
+
   const map = new ArcGISMap({
     basemap: "satellite",
   });
@@ -31,7 +37,7 @@ const Map: Component = () => {
   map.addMany(layers);
 
   onMount(() => {
-    const view = new MapView({
+    view = new MapView({
       map: map,
       container: mapDiv,
       zoom: 8,
@@ -48,9 +54,48 @@ const Map: Component = () => {
     });
   });
 
+  const xyToCoordinate = (x: number, y: number): Coordinate | undefined => {
+    if (!view?.container) return;
+    const yOffset = view.container.getBoundingClientRect().top + window.scrollY;
+    const xOffset = view.container.getBoundingClientRect().left + window.scrollX;
+    const point = view.toMap({ x: x - xOffset, y: y - yOffset });
+    if (!point) return;
+    try {
+      return new Coordinate(point.latitude ?? 0, point.longitude ?? 0);
+    } catch {
+      console.log("Tried to throw");
+      console.log("yOffset", yOffset);
+      console.log("xOffset", xOffset);
+      console.log("point", point);
+    }
+    return undefined;
+  };
+
+  const onMouseMove = (event: MouseEvent) => {
+    const coordinate = xyToCoordinate(event.pageX, event.pageY);
+    if (!coordinate) return;
+
+    setMouseCoordinate(coordinate);
+
+    // if (!drawing) return;
+    // switch (drawing) {
+    //   case "measure":
+    //     onMouseMoveMeasure(coordinate);
+    //     break;
+    //   case "line": {
+    //     onMouseMoveDrawLines(coordinate);
+    //     break;
+    //   }
+    //   case "circle":
+    //     onMouseMoveDrawCircles(coordinate);
+    //     break;
+    // }
+  };
+
   return (
     <div class="w-full h-192">
-      <div ref={mapDiv} class="p-0 m-0 size-full"></div>
+      <div ref={mapDiv} class="p-0 m-0 w-full h-[calc(100%-2rem)]" on:mousemove={onMouseMove}></div>
+      <BottomBar mouseCoordinate={mouseCoordinate() ?? new Coordinate("N0 E0")}></BottomBar>
     </div>
   );
 };
