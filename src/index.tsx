@@ -4,6 +4,8 @@ import { Route, Router } from "@solidjs/router";
 
 import "./index.css";
 import App from "./App";
+import { Tools } from "./Tools";
+import { ConvertCoordinate } from "./components/ConvertCoordinate";
 
 const root = document.getElementById("root");
 
@@ -16,7 +18,8 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
 render(
   () => (
     <Router root={App}>
-      <Route path="/" component={App} />
+      <Route path="/" component={Tools} />
+      <Route path="/test" component={ConvertCoordinate} />
     </Router>
   ),
   root!,

@@ -15,7 +15,6 @@ const ConvertCoordinate: Component = () => {
   const [coordinateText, setCoordinateText] = createSignal("No Coordinate Detected");
 
   createEffect(() => {
-    console.log("effect is running");
     const newCoordinate = getValue(convertCoordinateForm, "coordinate");
     if (!newCoordinate || !Coordinate.isValidText(newCoordinate)) return;
 

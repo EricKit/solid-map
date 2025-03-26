@@ -1,5 +1,5 @@
-import { A } from "@solidjs/router";
-import { Component, createSignal, JSX } from "solid-js";
+import { A, useLocation } from "@solidjs/router";
+import { Component, createEffect, createSignal, JSX } from "solid-js";
 
 type Props = Record<string, never>;
 
@@ -9,16 +9,11 @@ const Item: Component<{ href: string; sidebar?: boolean; children?: JSX.Element 
   children,
 }) => {
   const [active, setActive] = createSignal(false);
-  // const router = useRouter();
+  const location = useLocation();
 
-  // const [mounted, setMounted] = createSignal(true);
-
-  // useEffect(() => setMounted(true), []);
-
-  // useEffect(() => {
-  //   if (!router) return;
-  //   setActive(router.pathname === href);
-  // }, [href, router]);
+  createEffect(() => {
+    setActive(location.pathname === href);
+  });
 
   const className = () => {
     if (active() && sidebar)
@@ -43,28 +38,7 @@ const Item: Component<{ href: string; sidebar?: boolean; children?: JSX.Element 
 };
 
 const Navbar: Component<Props> = () => {
-  // const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = createSignal(false);
-  // const [userMenuOpen, setUserMenuOpen] = createSignal(false);
-  // const {
-  //   scenarios: { activeScenario },
-  // } = useContext(DataContext);
-
-  // const profileMenu = useRef<HTMLDivElement>(null);
-
-  // createEffect(() => {
-  //   const handleClick = (e: any) => {
-  //     // if (profileMenu.current?.contains(e.target)) {
-  //     //   return;
-  //     // }
-  //     // setUserMenuOpen(false);
-  //   };
-
-  //   document.addEventListener("mousedown", handleClick);
-  //   return () => {
-  //     document.removeEventListener("mousedown", handleClick);
-  //   };
-  // });
 
   return (
     <div>
@@ -109,16 +83,12 @@ const Navbar: Component<Props> = () => {
               <div class="hidden sm:block sm:ml-6">
                 <div class="flex items-center">
                   <Item href="/">Planning Tools</Item>
-                  <Item href="https://dieselplanning.com">Old Dieselplanning</Item>
-                  {/* <Item href="/data">Scenario</Item>
-                  <Item href="/tools">Tools</Item>
-                  <Item href="/help">Help</Item> */}
+                  <Item href="/test">Test</Item>
                 </div>
               </div>
             </div>
             <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-              {/* <!-- Profile dropdown --> */}
-              <Item href="/login">Account</Item>
+              <Item href="https://dieselplanning.com">Old Dieselplanning</Item>
             </div>
           </div>
         </div>
@@ -129,18 +99,6 @@ const Navbar: Component<Props> = () => {
               <Item href="/" sidebar>
                 Planning Tools
               </Item>
-              <Item href="https://dieselplanning.com" sidebar>
-                Old Dieselplanning
-              </Item>
-              {/* <Item href="/data" sidebar>
-                Scenario
-              </Item>
-              <Item href="/tools" sidebar>
-                Tools
-              </Item>
-              <Item href="/help" sidebar>
-                Help
-              </Item> */}
             </div>
           </div>
         )}
