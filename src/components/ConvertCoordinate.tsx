@@ -62,6 +62,7 @@ const ConvertCoordinate: Component = () => {
           <CoordinateCard
             title="Degrees Minutes Seconds"
             subTitle={coordinate()?.degreesMinutesSecondsDecimalSeconds ?? ""}
+            // subTitle={"[" + (coordinate()?.lngLatArray.toString() ?? "") + "]"}
           ></CoordinateCard>
           <CoordinateCard
             title="Degrees Minutes"

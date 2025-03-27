@@ -58,6 +58,18 @@
     "D35": {
       "type": "geojson",
       "data": "/geojson/D35.geojson"
+    },
+    "Sara": {
+      "type": "geojson",
+      "data": "/geojson/Sara.geojson"
+    },
+    "LIR10": {
+      "type": "geojson",
+      "data": "/geojson/LIR10.geojson"
+    },
+    "Zita": {
+      "type": "geojson",
+      "data": "/geojson/Zita.geojson"
     }
   },
   "layers": [
@@ -581,8 +593,47 @@
         "line-cap": "round"
       },
       "paint": {
-        "line-color": "#000",
+        "line-color": "#FFF",
         "line-width": 2
+      }
+    },
+    {
+      "id": "Sara",
+      "type": "line",
+      "source": "Sara",
+      "layout": {
+        "line-join": "round",
+        "line-cap": "round"
+      },
+      "paint": {
+        "line-color": "#FFF",
+        "line-width": 2
+      }
+    },
+    {
+      "id": "LIR10",
+      "type": "line",
+      "source": "LIR10",
+      "layout": {
+        "line-join": "round",
+        "line-cap": "round"
+      },
+      "paint": {
+        "line-color": "#990000",
+        "line-width": 1
+      }
+    },
+    {
+      "id": "Zita",
+      "type": "line",
+      "source": "Zita",
+      "layout": {
+        "line-join": "round",
+        "line-cap": "round"
+      },
+      "paint": {
+        "line-color": "#FFF",
+        "line-width": 1
       }
     }
   ]

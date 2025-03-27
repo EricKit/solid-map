@@ -40,7 +40,7 @@ const Map: Component = () => {
     map = new LibreMap({
       container: mapDiv, // container id
       style: mapStyle as StyleSpecification,
-      center: settings.startCenter.toLngLatArray(),
+      center: settings.startCenter.lngLatArray,
       zoom: 7, // starting zoom
     });
 

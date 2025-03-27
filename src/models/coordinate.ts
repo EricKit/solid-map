@@ -153,7 +153,7 @@ export class Coordinate {
     }
   }
 
-  toLngLatArray(): [number, number] {
+  get lngLatArray(): [number, number] {
     return [this.longitude, this.latitude];
   }
 
@@ -162,11 +162,11 @@ export class Coordinate {
   }
 
   distanceFromPoint(point: Coordinate): number {
-    return getDistance(point.toLngLatArray(), this.toLngLatArray());
+    return getDistance(point.lngLatArray, this.lngLatArray);
   }
 
   bearingFromPoint(point: Coordinate): number {
-    return getRhumbLineBearing(point.toLngLatArray(), this.toLngLatArray());
+    return getRhumbLineBearing(point.lngLatArray, this.lngLatArray);
   }
 
   bullseye(bullseye: Coordinate, magnetic = true): Bullsey {
