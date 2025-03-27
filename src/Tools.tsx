@@ -1,8 +1,8 @@
-import { Map } from "./components/Map";
 import { ConvertCoordinate } from "./components/ConvertCoordinate";
 import { Card } from "./components/Card";
 import { Component } from "solid-js";
 import { PageTemplate } from "./components/PageTemplate";
+import { Leaflet } from "./components/Leaflet";
 
 const Tools: Component = () => {
   return (
@@ -11,7 +11,7 @@ const Tools: Component = () => {
         <Card headerText="Convert Coordinates" class="mb-4">
           <ConvertCoordinate></ConvertCoordinate>
         </Card>
-        <Map></Map>
+        <Leaflet></Leaflet>
       </PageTemplate>
     </>
   );

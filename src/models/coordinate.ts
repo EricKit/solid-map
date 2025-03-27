@@ -157,6 +157,10 @@ export class Coordinate {
     return [this.longitude, this.latitude];
   }
 
+  get latLngArray(): [number, number] {
+    return [this.latitude, this.longitude];
+  }
+
   toLatLonObject(): { latitude: number; longitude: number } {
     return { latitude: this.latitude, longitude: this.longitude };
   }

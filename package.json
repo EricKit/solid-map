@@ -24,11 +24,15 @@
     "vite-plugin-solid": "^2.11.6"
   },
   "dependencies": {
+    "@maptiler/leaflet-maptilersdk": "^4.0.3",
     "@modular-forms/solid": "^0.25.1",
     "@solidjs/router": "^0.15.3",
     "@tailwindcss/vite": "^4.0.15",
+    "@types/geojson": "^7946.0.16",
+    "@types/leaflet": "^1.9.17",
     "geolib": "^3.3.4",
     "geomagnetism": "^0.2.0",
+    "leaflet": "^1.9.4",
     "maplibre-gl": "^5.2.0",
     "solid-icons": "^1.1.0",
     "solid-js": "^1.9.5",
