@@ -1,106 +1,112 @@
 import { createSignal, onMount, type Component } from "solid-js";
-import ArcGISMap from "@arcgis/core/Map.js";
-import MapView from "@arcgis/core/views/MapView.js";
-import GeoJSONLayer from "@arcgis/core/layers/GeoJSONLayer";
-import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
-import SimpleRenderer from "@arcgis/core/renderers/SimpleRenderer";
+
 import { BottomBar } from "./map/BottomBar";
 import Coordinate from "../models/coordinate";
+import { Map as LibreMap, NavigationControl, StyleSpecification } from "maplibre-gl";
+import "maplibre-gl/dist/maplibre-gl.css";
+import mapStyle from "../styles/maptilersat.json";
+import { useSettings } from "../context/settings";
+import { copyToClipboard } from "../library/lib";
 
 const Map: Component = () => {
   const [mouseCoordinate, setMouseCoordinate] = createSignal<Coordinate>();
+  const [settings, setSettings] = useSettings()!;
 
-  let view: MapView | undefined = undefined;
+  // eslint-disable-next-line prefer-const
+  let mapDiv: HTMLDivElement | undefined = undefined;
+  let map: LibreMap | undefined = undefined;
 
-  const map = new ArcGISMap({
-    basemap: "satellite",
-  });
+  // const color = "black";
+  // const moaSymbol = new SimpleFillSymbol({ style: "none", outline: { color } });
+  // const renderer = new SimpleRenderer({ symbol: moaSymbol });
+  // const layers = [
+  //   new GeoJSONLayer({ url: "/geojson/Korea_LLZs.geojson", geometryType: "polygon", renderer }),
+  //   new GeoJSONLayer({ url: "/geojson/2NM_Buffer.geojson", geometryType: "polygon", renderer }),
+  //   new GeoJSONLayer({ url: "/geojson/Current_BMGR_May_2020.geojson", geometryType: "polygon", renderer }),
+  //   new GeoJSONLayer({ url: "/geojson/Korea_NFL.geojson", geometryType: "polygon", renderer }),
+  //   new GeoJSONLayer({ url: "/geojson/Low_MOAs.geojson", geometryType: "polygon", renderer }),
+  //   new GeoJSONLayer({ url: "/geojson/MOAs.geojson", geometryType: "polygon", renderer }),
+  //   new GeoJSONLayer({ url: "/geojson/New_BMGR.geojson", geometryType: "polygon", renderer }),
+  //   new GeoJSONLayer({ url: "/geojson/P_518_Border.geojson", geometryType: "polygon", renderer }),
+  //   new GeoJSONLayer({ url: "/geojson/Restricted_Areas.geojson", renderer }),
+  //   new GeoJSONLayer({ url: "/geojson/D35.geojson", renderer }),
+  // ];
 
-  let mapDiv;
-
-  const color = "black";
-  const moaSymbol = new SimpleFillSymbol({ style: "none", outline: { color } });
-  const renderer = new SimpleRenderer({ symbol: moaSymbol });
-  const layers = [
-    new GeoJSONLayer({ url: "/geojson/Korea_LLZs.geojson", geometryType: "polygon", renderer }),
-    new GeoJSONLayer({ url: "/geojson/2NM_Buffer.geojson", geometryType: "polygon", renderer }),
-    new GeoJSONLayer({ url: "/geojson/Current_BMGR_May_2020.geojson", geometryType: "polygon", renderer }),
-    new GeoJSONLayer({ url: "/geojson/Korea_NFL.geojson", geometryType: "polygon", renderer }),
-    new GeoJSONLayer({ url: "/geojson/Low_MOAs.geojson", geometryType: "polygon", renderer }),
-    new GeoJSONLayer({ url: "/geojson/MOAs.geojson", geometryType: "polygon", renderer }),
-    new GeoJSONLayer({ url: "/geojson/New_BMGR.geojson", geometryType: "polygon", renderer }),
-    new GeoJSONLayer({ url: "/geojson/P_518_Border.geojson", geometryType: "polygon", renderer }),
-    new GeoJSONLayer({ url: "/geojson/Restricted_Areas.geojson", renderer }),
-    new GeoJSONLayer({ url: "/geojson/D35.geojson", renderer }),
-  ];
-
-  map.addMany(layers);
+  // map.addMany(layers);
 
   onMount(() => {
-    view = new MapView({
-      map: map,
-      container: mapDiv,
-      zoom: 8,
-      center: [-115.75, 37.25],
-      ui: {
-        components: ["attribution", "compass", "zoom"], //basemaplayerlist
-      },
+    if (!mapDiv) return;
+
+    map = new LibreMap({
+      container: mapDiv, // container id
+      style: mapStyle as StyleSpecification,
+      center: settings.startCenter.toLngLatArray(),
+      zoom: 7, // starting zoom
     });
 
-    view.ui.move("zoom", "bottom-right");
+    map.addControl(
+      new NavigationControl({
+        visualizePitch: true,
+        visualizeRoll: true,
+        showZoom: true,
+        showCompass: true,
+      }),
+    );
 
-    view.when(() => {
-      console.log("Map is loaded");
+    // const geoNames = [
+    //   "Korea_LLZs",
+    //   "2NM_Buffer",
+    //   "Current_BMGR_May_2020",
+    //   "Korea_NFL",
+    //   "Low_MOAs",
+    //   "MOAs",
+    //   "New_BMGR",
+    //   "P_518_Border",
+    //   "Restricted_Areas",
+    //   "D35",
+    // ];
+
+    map.on("load", () => {
+      // geoNames.forEach((geoName) => {
+      //   map!.addSource(geoName, { type: "geojson", data: `/geojson/${geoName}.geojson` });
+      //   map!.addLayer({
+      //     id: geoName,
+      //     type: "line",
+      //     source: geoName,
+      //     layout: {
+      //       "line-join": "round",
+      //       "line-cap": "round",
+      //     },
+      //     paint: {
+      //       "line-color": "#000",
+      //       "line-width": 2,
+      //     },
+      //   });
+      // });
+      // const styleJson = map.getStyle();
+      // console.log(styleJson);
+      map!.on("mousemove", (e) => {
+        setMouseCoordinate(new Coordinate(e.lngLat.lat, e.lngLat.lng));
+      });
+
+      map!.on("mouseup", (e) => {
+        const coordinate = new Coordinate(e.lngLat.lat, e.lngLat.lng);
+
+        copyToClipboard(coordinate.toFormat(settings.coordinateFormat));
+      });
+
+      map!.on("click", (e) => {});
     });
   });
 
-  const xyToCoordinate = (x: number, y: number): Coordinate | undefined => {
-    if (!view?.container) return;
-    const yOffset = view.container.getBoundingClientRect().top + window.scrollY;
-    const xOffset = view.container.getBoundingClientRect().left + window.scrollX;
-    const point = view.toMap({ x: x - xOffset, y: y - yOffset });
-    if (!point) return;
-    try {
-      return new Coordinate(point.latitude ?? 0, point.longitude ?? 0);
-    } catch {
-      console.log("Tried to throw");
-      console.log("yOffset", yOffset);
-      console.log("xOffset", xOffset);
-      console.log("point", point);
-    }
-    return undefined;
-  };
-
-  const onMouseMove = (event: MouseEvent) => {
-    const coordinate = xyToCoordinate(event.pageX, event.pageY);
-    if (!coordinate) return;
-
-    setMouseCoordinate(coordinate);
-
-    // if (!drawing) return;
-    // switch (drawing) {
-    //   case "measure":
-    //     onMouseMoveMeasure(coordinate);
-    //     break;
-    //   case "line": {
-    //     onMouseMoveDrawLines(coordinate);
-    //     break;
-    //   }
-    //   case "circle":
-    //     onMouseMoveDrawCircles(coordinate);
-    //     break;
-    // }
-  };
-
   return (
-    <div class="w-full h-192">
-      {/* <div ref={mapDiv} class="p-0 m-0 w-full h-[calc(100%-2rem)]" on:mousemove={onMouseMove}></div> */}
-      <div ref={mapDiv} class="p-0 m-0 w-full h-[calc(100%-2rem)]">
-        {" "}
-      </div>
+    <>
+      <div class="w-full h-192">
+        <div ref={mapDiv} class="p-0 m-0 w-full h-[calc(100%-2rem)]"></div>
 
-      <BottomBar mouseCoordinate={mouseCoordinate() ?? new Coordinate("N0 E0")}></BottomBar>
-    </div>
+        <BottomBar mouseCoordinate={mouseCoordinate() ?? new Coordinate("N0 E0")}></BottomBar>
+      </div>
+    </>
   );
 };
 

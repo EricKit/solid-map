@@ -1,7 +1,10 @@
+import { getDistance, getRhumbLineBearing } from "geolib";
 import { roundAndTruncate } from "../library/lib";
+import geomagnetism from "geomagnetism";
 // import mgrs from '../projects/mgrs/dist/mgrs';
 
 export type CoordinateFormat = "D.D" | "D M.M" | "D M S.S" | "MGRS";
+export type Bullsey = [number, number]; //bearing, range
 
 export class Coordinate {
   latitudeDecimal: number;
@@ -150,8 +153,36 @@ export class Coordinate {
     }
   }
 
+  toLngLatArray(): [number, number] {
+    return [this.longitude, this.latitude];
+  }
+
   toLatLonObject(): { latitude: number; longitude: number } {
     return { latitude: this.latitude, longitude: this.longitude };
+  }
+
+  distanceFromPoint(point: Coordinate): number {
+    return getDistance(point.toLngLatArray(), this.toLngLatArray());
+  }
+
+  bearingFromPoint(point: Coordinate): number {
+    return getRhumbLineBearing(point.toLngLatArray(), this.toLngLatArray());
+  }
+
+  bullseye(bullseye: Coordinate, magnetic = true): Bullsey {
+    return [
+      this.bearingFromPoint(bullseye) + (magnetic ? this.magVar : 0),
+      this.distanceFromPoint(bullseye) * 0.0005399565,
+    ];
+  }
+
+  bullseyeText(bullseye: Coordinate, magnetic = true) {
+    const pointBullseye = this.bullseye(bullseye, magnetic);
+    return `${roundAndTruncate(pointBullseye[0], 0)}/${roundAndTruncate(pointBullseye[1], 0)}`;
+  }
+
+  get magVar() {
+    return geomagnetism.model().point([this.latitude, this.longitude]).decl;
   }
 
   get latitude() {
@@ -237,6 +268,19 @@ export class Coordinate {
       return true;
     } catch {
       return false;
+    }
+  }
+
+  public static fullFormatText(format: CoordinateFormat) {
+    switch (format) {
+      case "D M S.S":
+        return "Degrees Minutes Seconds";
+      case "D M.M":
+        return "Degrees Minutes";
+      case "D.D":
+        return "Degrees";
+      case "MGRS":
+        return "MGRS";
     }
   }
 }

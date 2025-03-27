@@ -13,6 +13,19 @@ export function timer(ms: number) {
   });
 }
 
+export function copyToClipboard(text: string) {
+  if (!document) return;
+  const el = document.createElement("textarea");
+  el.value = text;
+  el.style.position = "absolute";
+  el.style.left = "-9999px";
+  el.setAttribute("readonly", "");
+  document.body.appendChild(el);
+  el.select();
+  document.execCommand("copy");
+  document.body.removeChild(el);
+}
+
 export type RenderingEngine = "firefox" | "seamonkey" | "ie" | "opera" | "safari" | "chrome" | "chromium" | "unknown";
 
 export function getRenderingEngine() {

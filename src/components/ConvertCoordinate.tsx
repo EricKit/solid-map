@@ -16,17 +16,21 @@ const ConvertCoordinate: Component = () => {
 
   createEffect(() => {
     const newCoordinate = getValue(convertCoordinateForm, "coordinate");
-    if (!newCoordinate || !Coordinate.isValidText(newCoordinate)) return;
+    if (!newCoordinate || !Coordinate.isValidText(newCoordinate)) {
+      setCoordinateText("Invalid Coordinate");
+      setCoordinate(undefined);
+      return;
+    }
 
     const coordinate = new Coordinate(newCoordinate);
 
     setCoordinate(coordinate);
 
     if (coordinate && coordinate.detected !== "Not Detected") {
-      setCoordinateText(`Detected Format: ${coordinate.detected} - Detected Coordinate:
-          ${coordinate.toFormat(coordinate.detected)}`);
+      setCoordinateText(
+        `Detected ${coordinate.toFormat(coordinate.detected)} in format ${Coordinate.fullFormatText(coordinate.detected)}`,
+      );
     }
-    console.log(coordinateText);
   });
 
   return (

@@ -14,7 +14,6 @@ interface FormItemProps {
 
 function ErrorElement({ errorText }: { errorText?: string }) {
   const styles = getComputedStyle(document.documentElement);
-  console.log(styles.getPropertyValue("color-danger"));
 
   return (
     <>

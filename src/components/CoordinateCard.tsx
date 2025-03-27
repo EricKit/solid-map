@@ -1,17 +1,9 @@
 import { type Component } from "solid-js";
+import { copyToClipboard } from "../library/lib";
 
 const CoordinateCard: Component<{ title: string; subTitle: string }> = (props) => {
   const copyCoordinate = (coordinate: string) => {
-    if (!document) return;
-    const el = document.createElement("textarea");
-    el.value = coordinate;
-    el.style.position = "absolute";
-    el.style.left = "-9999px";
-    el.setAttribute("readonly", "");
-    document.body.appendChild(el);
-    el.select();
-    document.execCommand("copy");
-    document.body.removeChild(el);
+    copyToClipboard(coordinate);
   };
 
   return (
