@@ -42,7 +42,7 @@ const Map: Component = () => {
       style: mapStyle as StyleSpecification,
       center: settings.startCenter.lngLatArray,
       zoom: 7, // starting zoom
-      canvasContextAttributes: { powerPreference: "low-power", contextType: "webgl" },
+      canvasContextAttributes: { powerPreference: "low-power", desynchronized: true },
     });
 
     map.addControl(
