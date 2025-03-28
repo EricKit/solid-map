@@ -2,7 +2,7 @@ import { ConvertCoordinate } from "./components/ConvertCoordinate";
 import { Card } from "./components/Card";
 import { Component } from "solid-js";
 import { PageTemplate } from "./components/PageTemplate";
-import { Leaflet } from "./components/Leaflet";
+import { Leaflet } from "./components/map/leaflet/Leaflet";
 
 const Tools: Component = () => {
   return (
