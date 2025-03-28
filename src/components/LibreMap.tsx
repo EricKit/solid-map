@@ -4,7 +4,7 @@ import { BottomBar } from "./map/BottomBar";
 import Coordinate from "../models/coordinate";
 import { Map as LibreMap, NavigationControl, StyleSpecification } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import mapStyle from "../styles/maptilersat.json";
+import mapStyle from "./map/styles/maptilersat.json";
 import { useSettings } from "../context/settings";
 import { copyToClipboard } from "../library/lib";
 

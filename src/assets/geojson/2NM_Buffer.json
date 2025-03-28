@@ -1,8 +1,24 @@
 {
-"type": "FeatureCollection",
-"name": "2NM Buffer",
-"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
-"features": [
-{ "type": "Feature", "geometry": { "type": "LineString", "coordinates": [ [ 126.83249, 37.68951 ], [ 126.84415, 37.79318 ], [ 127.25721, 38.13051 ], [ 127.50796, 38.16118 ], [ 127.62513, 38.0118 ], [ 127.75753, 37.98394 ], [ 128.42043, 38.03732 ], [ 128.55303, 38.14124 ], [ 128.58348, 38.26825 ] ] } }
-]
+  "type": "FeatureCollection",
+  "name": "2NM Buffer",
+  "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [126.83249, 37.68951],
+          [126.84415, 37.79318],
+          [127.25721, 38.13051],
+          [127.50796, 38.16118],
+          [127.62513, 38.0118],
+          [127.75753, 37.98394],
+          [128.42043, 38.03732],
+          [128.55303, 38.14124],
+          [128.58348, 38.26825]
+        ]
+      }
+    }
+  ]
 }
