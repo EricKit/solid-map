@@ -3,10 +3,8 @@ import { createSignal, onMount, type Component } from "solid-js";
 import { BottomBar } from "./map/BottomBar";
 import Coordinate from "../models/coordinate";
 
-import { map as leafletMap, Map } from "leaflet";
+import { map as leafletMap, Map, tileLayer } from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { MaptilerLayer } from "@maptiler/leaflet-maptilersdk";
-import maptilerStyle from "../styles/maptilersat.json";
 
 import { useSettings } from "../context/settings";
 import { copyToClipboard } from "../library/lib";
@@ -42,11 +40,17 @@ const Leaflet: Component = () => {
 
     map = leafletMap(mapDiv, { center: settings.startCenter.latLngArray, zoom: 8 });
 
-    const mtLayer = new MaptilerLayer({
-      style: maptilerStyle as never,
-      apiKey: "tIvBavM5TIO7t5U84YFJ",
+    console.log(import.meta.env);
+
+    tileLayer(`https://api.maptiler.com/maps/satellite/{z}/{x}/{y}@2x.jpg?key=${import.meta.env.VITE_MAPTILERKEY}`, {
+      //style URL
+      tileSize: 512,
+      zoomOffset: -1,
+      minZoom: 1,
+      attribution:
+        '\u003ca href="https://www.maptiler.com/copyright/" target="_blank"\u003e\u0026copy; MapTiler\u003c/a\u003e \u003ca href="https://www.openstreetmap.org/copyright" target="_blank"\u003e\u0026copy; OpenStreetMap contributors\u003c/a\u003e',
+      crossOrigin: true,
     }).addTo(map);
-    console.log("map made");
 
     map!.on("mousemove", (e) => {
       setMouseCoordinate(new Coordinate(e.latlng.lat, e.latlng.lng));
