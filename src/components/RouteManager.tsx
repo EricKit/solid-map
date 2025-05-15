@@ -1,4 +1,4 @@
-import { createEffect, createSignal, Show, type Component } from "solid-js";
+import { createSignal, Show, type Component } from "solid-js";
 
 import { useSettings } from "../context/settings";
 import { RouteTable } from "./RouteTable";
@@ -39,7 +39,7 @@ const RouteManager: Component<{ point?: RoutePoint }> = () => {
           point={editPoint() === undefined ? undefined : settings.route.points[editPoint()!]}
         ></RouteInput>
       </Show>
-      <Show when={editPoint !== undefined && editPoint()! < settings.route.points.length}>
+      <Show when={editPoint() !== undefined && editPoint()! < settings.route.points.length}>
         <RouteTable
           edit={(index) => setEditPoint(index)}
           start={editPoint() === undefined ? undefined : editPoint()! + 1}
