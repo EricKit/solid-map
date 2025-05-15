@@ -15,7 +15,7 @@ import {
 import { useSettings } from "../context/settings";
 import { Airspeed } from "../models/airspeed";
 import { RoutePoint } from "../models/route";
-import { FiSave } from "solid-icons/fi";
+import { FiPlus } from "solid-icons/fi";
 
 type RouteForm = {
   coordinate: string;
@@ -136,7 +136,7 @@ const RouteInput: Component<{
             </Field>
           </div>
           <button class="btn btn-icon" type="submit">
-            <FiSave size="20" />
+            <FiPlus size="20" />
           </button>
         </div>
       </Form>

@@ -2,24 +2,34 @@ import { getDistance, getRhumbLineBearing } from "geolib";
 import { roundAndTruncate } from "../library/lib";
 import geomagnetism from "geomagnetism";
 import { forward, toPoint } from "mgrs";
-// import mgrs from '../projects/mgrs/dist/mgrs';
 
 export type CoordinateFormat = "D.D" | "D M.M" | "D M S.S" | "MGRS";
 export type Bullsey = [number, number]; //bearing, range
 
 export class Coordinate {
-  latitudeDecimal: number;
-  longitudeDecimal: number;
-  latitudeWhole: number;
-  longitudeWhole: number;
+  latitudeDecimal: number = 0;
+  longitudeDecimal: number = 0;
+  latitudeWhole: number = 0;
+  longitudeWhole: number = 0;
   // To know how a coordinate was created if passed in a string, otherwise it is
   // not detected
-  detected: CoordinateFormat | "Not Detected";
+  detected: CoordinateFormat | "Not Detected" = "Not Detected";
 
-  // Create a coordinate by latitude and longitude
+  /**
+   * Create a coordinate by latitude and longitude
+   * @param latitude Decimal latitude
+   * @param longitude Decimal longitude
+   */
   constructor(latitude: number, longitude: number);
 
-  // Create a coordinate from a string
+  /**
+   * Create a coordinate from a string in various formats:
+   * - Decimal degrees (D.D): "N 34.56 W 117.83"
+   * - Degrees and decimal minutes (D M.M): "N 34 33.6 W 117 49.8"
+   * - Degrees, minutes, and decimal seconds (D M S.S): "N 34 33 36 W 117 49 48"
+   * - MGRS: "11SNA 12345 67890"
+   * @param coordinate String representation of a coordinate
+   */
   constructor(coordinate: string);
 
   constructor(latOrString: number | string, longitude?: number) {
@@ -37,13 +47,13 @@ export class Coordinate {
       this.detected = "Not Detected";
       return;
     }
+    
     if (typeof latOrString !== "string")
       throw new Error(`Pass a string or (latitude, longitude), passed ${latOrString}`);
+    
     const coordinate = latOrString;
 
-    // Check if the coordinate is MGRS, of so, handle it.
-    // Of note, if a 10 digit grid is passed, converted to lat/lng, then back to
-    // MGRS it can be off by the 5th digit (1 meter).
+    // Check if the coordinate is MGRS format
     const mgrsRegex = /^[0-9]+[a-zA-Z]\s*[a-zA-Z]+\s*([0-9]\s*[0-9]\s*)+$/;
     if (mgrsRegex.test(coordinate)) {
       // Remove spaces
@@ -72,7 +82,7 @@ export class Coordinate {
       return;
     }
 
-    // This intentionally takes almsot any format of coordinate. It errs to guessing over
+    // This intentionally takes almost any format of coordinate. It errs to guessing over
     // wanting perfectly formatted coordinates. It searches for W or E in the string and
     // looks at the number of digits grouped together.
     const containsWest = coordinate.match(/[wW]+/) ? true : false;
@@ -137,7 +147,13 @@ export class Coordinate {
       throw new Error("Not valid coordinates");
   }
 
-  // Helpful if the format the user wants is stored in the preferences
+  /**
+   * Convert the coordinate to the specified format
+   * @param format The desired output format
+   * @param showTrailingZeros Whether to display trailing zeros in the output
+   * @returns Formatted coordinate string
+   */
+
   toFormat(format: CoordinateFormat, showTrailingZeros = false): string {
     switch (format) {
       case "D.D":
@@ -166,10 +182,20 @@ export class Coordinate {
     return { latitude: this.latitude, longitude: this.longitude };
   }
 
+  /**
+   * Calculate the distance in meters from this coordinate to another point
+   * @param point The reference coordinate
+   * @returns Distance in meters
+   */
   distanceFromPoint(point: Coordinate): number {
     return getDistance(point.lngLatArray, this.lngLatArray);
   }
 
+  /**
+   * Calculate the bearing from this coordinate to another point
+   * @param point The reference coordinate
+   * @returns Bearing in degrees
+   */
   bearingFromPoint(point: Coordinate): number {
     return getRhumbLineBearing(point.lngLatArray, this.lngLatArray);
   }
@@ -199,6 +225,11 @@ export class Coordinate {
   }
 
   // Returns N 34.54 W 113.24
+  /**
+   * Format coordinate as decimal degrees (e.g., "N 34.56789 W 117.12345")
+   * @param showTrailingZeros Whether to show trailing zeros in decimal part
+   * @returns Formatted string in D.D format
+   */
   degreesDecimalDegrees(showTrailingZeros = false) {
     const latDeg = Math.abs(this.latitudeWhole);
     const lngDeg = Math.abs(this.longitudeWhole);
@@ -220,7 +251,11 @@ export class Coordinate {
     return `${latHemisphere} ${latDeg}${latDecimal} ` + `${lngHemisphere} ${lngDeg}${lngDecimal}`;
   }
 
-  // Returns N 34 50.2 W 116 32.4
+  /**
+   * Format coordinate as degrees and decimal minutes (e.g., "N 34 50.2 W 116 32.4")
+   * @param showTrailingZeros Whether to show trailing zeros in decimal part
+   * @returns Formatted string in D M.M format
+   */
   degreesMinutesDecimalMinutes(showTrailingZeros = false) {
     const latMin = Math.abs(this.latitudeDecimal * 60);
     const lngMin = Math.abs(this.longitudeDecimal * 60);
@@ -238,7 +273,12 @@ export class Coordinate {
     );
   }
 
-  // Returns N 39 50 24.23 W 115 34 23.9
+  /**
+   * Format coordinate as degrees, minutes, and decimal seconds
+   * (e.g., "N 39 50 24.23 W 115 34 23.9")
+   * @param showTrailingZeros Whether to show trailing zeros in decimal part
+   * @returns Formatted string in D M S.S format
+   */
   degreesMinutesSecondsDecimalSeconds(showTrailingZeros = false): string {
     const latMin = Math.abs(this.latitudeDecimal) * 60;
     const latMinFloor = Math.floor(latMin);
@@ -271,6 +311,11 @@ export class Coordinate {
     );
   }
 
+  /**
+   * Check if a string can be parsed as a valid coordinate
+   * @param coordinate String to validate
+   * @returns True if string can be parsed as a coordinate
+   */
   public static isValidText(coordinate: string) {
     try {
       new Coordinate(coordinate);
@@ -280,6 +325,11 @@ export class Coordinate {
     }
   }
 
+  /**
+   * Get the full descriptive text for a coordinate format
+   * @param format The coordinate format code
+   * @returns Human-readable description of the format
+   */
   public static fullFormatText(format: CoordinateFormat) {
     switch (format) {
       case "D M S.S":
@@ -293,6 +343,11 @@ export class Coordinate {
     }
   }
 
+  /**
+   * Get the precision level for a given coordinate format
+   * @param format The coordinate format code
+   * @returns The precision level as a string
+   */
   public static getPrecision(format: CoordinateFormat) {
     switch (format) {
       case "D M S.S":

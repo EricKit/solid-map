@@ -9,7 +9,7 @@ import { addAirspaceGeoJson } from "./leaflet-lib";
 
 const Leaflet: Component = () => {
   const [mouseCoordinate, setMouseCoordinate] = createSignal<Coordinate>();
-  const [settings, setSettings] = useSettings()!;
+  const [settings] = useSettings()!;
 
   // eslint-disable-next-line prefer-const
   let mapDiv: HTMLDivElement | undefined = undefined;
@@ -23,13 +23,15 @@ const Leaflet: Component = () => {
     if (!map) return;
 
     const line = polyline(array, { color: "red" }).addTo(map);
-    // line.on("click", (e) => {
+    // Uncomment if you want to allow removing lines by clicking
+    // line.on("click", () => {
     //   line.removeFrom(map!);
     // });
 
+    const MAX_ZOOM_LEVEL = 10;
+    
     if (!map.getBounds().contains(line.getBounds())) {
-      console.log("doesnt fit!");
-      map.fitBounds(line.getBounds(), { maxZoom: 10 });
+      map.fitBounds(line.getBounds(), { maxZoom: MAX_ZOOM_LEVEL });
     }
 
     onCleanup(() => {
@@ -42,8 +44,13 @@ const Leaflet: Component = () => {
 
     map = leafletMap(mapDiv, { center: settings.startCenter.latLngArray, zoom: 8 });
 
-    tileLayer(`https://api.maptiler.com/maps/satellite/{z}/{x}/{y}@2x.jpg?key=${import.meta.env.VITE_MAPTILERKEY}`, {
-      //style URL
+    const mapTilerKey = import.meta.env.VITE_MAPTILERKEY;
+    if (!mapTilerKey) {
+      console.warn("MapTiler API key is missing. Map may not display correctly.");
+    }
+    
+    tileLayer(`https://api.maptiler.com/maps/satellite/{z}/{x}/{y}@2x.jpg?key=${mapTilerKey || ''}`, {
+      // style URL
       tileSize: 512,
       zoomOffset: -1,
       minZoom: 1,
@@ -54,16 +61,19 @@ const Leaflet: Component = () => {
 
     addAirspaceGeoJson(map);
 
-    map!.on("mousemove", (e) => {
+    // Use optional chaining for safer access to the map object
+    map?.on("mousemove", (e) => {
       setMouseCoordinate(new Coordinate(e.latlng.lat, e.latlng.lng));
     });
 
-    map!.on("mouseup", (e) => {
+    map?.on("mouseup", (e) => {
       const coordinate = new Coordinate(e.latlng.lat, e.latlng.lng);
       copyToClipboard(coordinate.toFormat(settings.coordinateFormat));
     });
 
-    map!.on("click", (e) => {});
+    map!.on("click", () => {
+      // Click handler for future functionality
+    });
   });
 
   return (
