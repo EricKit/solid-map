@@ -1,6 +1,6 @@
-import { createSignal, onMount, type Component } from "solid-js";
+import { createEffect, createSignal, onCleanup, onMount, type Component } from "solid-js";
 import { BottomBar } from "../BottomBar";
-import { map as leafletMap, Map, tileLayer } from "leaflet";
+import { map as leafletMap, Map, tileLayer, polyline } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useSettings } from "../../../context/settings";
 import { copyToClipboard } from "../../../library/lib";
@@ -14,6 +14,28 @@ const Leaflet: Component = () => {
   // eslint-disable-next-line prefer-const
   let mapDiv: HTMLDivElement | undefined = undefined;
   let map: Map | undefined = undefined;
+
+  createEffect(() => {
+    const array = settings.route.points.map((point) => {
+      return point.coordinate.latLngArray;
+    });
+
+    if (!map) return;
+
+    const line = polyline(array, { color: "red" }).addTo(map);
+    // line.on("click", (e) => {
+    //   line.removeFrom(map!);
+    // });
+
+    if (!map.getBounds().contains(line.getBounds())) {
+      console.log("doesnt fit!");
+      map.fitBounds(line.getBounds(), { maxZoom: 10 });
+    }
+
+    onCleanup(() => {
+      if (map) line.removeFrom(map);
+    });
+  });
 
   onMount(() => {
     if (!mapDiv) return;
@@ -38,7 +60,6 @@ const Leaflet: Component = () => {
 
     map!.on("mouseup", (e) => {
       const coordinate = new Coordinate(e.latlng.lat, e.latlng.lng);
-
       copyToClipboard(coordinate.toFormat(settings.coordinateFormat));
     });
 

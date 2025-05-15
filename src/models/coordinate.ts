@@ -1,6 +1,7 @@
 import { getDistance, getRhumbLineBearing } from "geolib";
 import { roundAndTruncate } from "../library/lib";
 import geomagnetism from "geomagnetism";
+import { forward, toPoint } from "mgrs";
 // import mgrs from '../projects/mgrs/dist/mgrs';
 
 export type CoordinateFormat = "D.D" | "D M.M" | "D M S.S" | "MGRS";
@@ -58,7 +59,7 @@ export class Coordinate {
         }
       }
 
-      const [lng, lat] = [0, 0]; // mgrs.toPoint(string);
+      const [lng, lat] = toPoint(string);
       this.latitudeWhole = Math.floor(Math.abs(lat));
       this.longitudeWhole = Math.floor(Math.abs(lng));
       this.latitudeDecimal = lat % 1;
@@ -137,16 +138,16 @@ export class Coordinate {
   }
 
   // Helpful if the format the user wants is stored in the preferences
-  toFormat(format: CoordinateFormat): string {
+  toFormat(format: CoordinateFormat, showTrailingZeros = false): string {
     switch (format) {
       case "D.D":
-        return this.degreesDecimalDegrees;
+        return this.degreesDecimalDegrees(showTrailingZeros);
       case "D M.M":
-        return this.degreesMinutesDecimalMinutes;
+        return this.degreesMinutesDecimalMinutes(showTrailingZeros);
       case "D M S.S":
-        return this.degreesMinutesSecondsDecimalSeconds;
+        return this.degreesMinutesSecondsDecimalSeconds(showTrailingZeros);
       case "MGRS": {
-        let value = "        "; //mgrs.forward([this.longitude, this.latitude], 5);
+        let value = forward(this.lngLatArray, 5);
         value = value.slice(0, 3) + " " + value.slice(3, 5) + " " + value.slice(5, 10) + " " + value.slice(10);
         return value;
       }
@@ -198,7 +199,7 @@ export class Coordinate {
   }
 
   // Returns N 34.54 W 113.24
-  get degreesDecimalDegrees() {
+  degreesDecimalDegrees(showTrailingZeros = false) {
     const latDeg = Math.abs(this.latitudeWhole);
     const lngDeg = Math.abs(this.longitudeWhole);
     let latHemisphere = "N";
@@ -206,19 +207,21 @@ export class Coordinate {
     if (this.latitudeWhole < 0) latHemisphere = "S";
     if (this.longitudeWhole < 0) lngHemisphere = "W";
 
-    const latDecimalSplit = roundAndTruncate(this.latitudeDecimal, 6).split(".");
+    const latDecimalSplit = roundAndTruncate(this.latitudeDecimal, 6, 0, showTrailingZeros ? 6 : 0).split(".");
     let latDecimal = latDecimalSplit?.[1] ?? "";
+    if (!latDecimal && showTrailingZeros) latDecimal = "000000";
     if (latDecimal) latDecimal = "." + latDecimal;
 
-    const lngDecimalSplit = roundAndTruncate(this.longitudeDecimal, 6).split(".");
+    const lngDecimalSplit = roundAndTruncate(this.longitudeDecimal, 6, 0, showTrailingZeros ? 6 : 0).split(".");
     let lngDecimal = lngDecimalSplit?.[1] ?? "";
+    if (!lngDecimal && showTrailingZeros) lngDecimal = "000000";
     if (lngDecimal) lngDecimal = "." + lngDecimal;
 
     return `${latHemisphere} ${latDeg}${latDecimal} ` + `${lngHemisphere} ${lngDeg}${lngDecimal}`;
   }
 
   // Returns N 34 50.2 W 116 32.4
-  get degreesMinutesDecimalMinutes() {
+  degreesMinutesDecimalMinutes(showTrailingZeros = false) {
     const latMin = Math.abs(this.latitudeDecimal * 60);
     const lngMin = Math.abs(this.longitudeDecimal * 60);
     let latHemisphere = "N";
@@ -230,13 +233,13 @@ export class Coordinate {
       lngHemisphere = "W";
     }
     return (
-      `${latHemisphere} ${Math.abs(this.latitudeWhole)} ${roundAndTruncate(latMin, 4, 2)} ` +
-      `${lngHemisphere} ${Math.abs(this.longitudeWhole)} ${roundAndTruncate(lngMin, 4, 2)}`
+      `${latHemisphere} ${Math.abs(this.latitudeWhole)} ${roundAndTruncate(latMin, 4, 0, showTrailingZeros ? 4 : 0)} ` +
+      `${lngHemisphere} ${Math.abs(this.longitudeWhole)} ${roundAndTruncate(lngMin, 4, 0, showTrailingZeros ? 4 : 0)}`
     );
   }
 
   // Returns N 39 50 24.23 W 115 34 23.9
-  get degreesMinutesSecondsDecimalSeconds() {
+  degreesMinutesSecondsDecimalSeconds(showTrailingZeros = false): string {
     const latMin = Math.abs(this.latitudeDecimal) * 60;
     const latMinFloor = Math.floor(latMin);
     const latSec = latMinFloor === 0 ? latMin * 60 : (latMin % latMinFloor) * 60;
@@ -253,15 +256,17 @@ export class Coordinate {
       lngHemisphere = "W";
     }
     return (
-      `${latHemisphere} ${Math.abs(this.latitudeWhole)} ${roundAndTruncate(latMinFloor, 2, 2)} ${roundAndTruncate(
+      `${latHemisphere} ${Math.abs(this.latitudeWhole)} ${roundAndTruncate(latMinFloor, 2, 0, showTrailingZeros ? 2 : 0)} ${roundAndTruncate(
         latSec,
         2,
-        2,
+        0,
+        showTrailingZeros ? 2 : 0,
       )} ` +
-      `${lngHemisphere} ${Math.abs(this.longitudeWhole)} ${roundAndTruncate(lngMinFloor, 2, 2)} ${roundAndTruncate(
+      `${lngHemisphere} ${Math.abs(this.longitudeWhole)} ${roundAndTruncate(lngMinFloor, 2, 0, showTrailingZeros ? 2 : 0)} ${roundAndTruncate(
         lngSec,
         2,
-        2,
+        0,
+        showTrailingZeros ? 2 : 0,
       )}`
     );
   }
@@ -285,6 +290,19 @@ export class Coordinate {
         return "Degrees";
       case "MGRS":
         return "MGRS";
+    }
+  }
+
+  public static getPrecision(format: CoordinateFormat) {
+    switch (format) {
+      case "D M S.S":
+        return "0.308 meters";
+      case "D M.M":
+        return "0.185 meters";
+      case "D.D":
+        return "0.11 meters";
+      case "MGRS":
+        return "1 meter";
     }
   }
 }

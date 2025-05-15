@@ -1,18 +1,30 @@
-import { createEffect, createSignal, type Component } from "solid-js";
-import Coordinate from "../models/coordinate";
+import { createEffect, createSignal, For, type Component } from "solid-js";
+import { Coordinate, CoordinateFormat } from "../models/coordinate";
 import { CoordinateCard } from "./CoordinateCard";
 import { Input } from "./forms/Input";
 import { createForm, custom, getValue, required } from "@modular-forms/solid";
+import { Checkbox } from "./forms/Checkbox";
 
 const ConvertCoordinate: Component = () => {
   type ConvertCoordinateForm = {
     coordinate: string;
+    showTrailingZeros: boolean;
   };
 
   const [coordinate, setCoordinate] = createSignal<Coordinate | undefined>(undefined);
-  const [convertCoordinateForm, { Form, Field }] = createForm<ConvertCoordinateForm>();
+  const [showTrailingZeros, setShowTrailingZeros] = createSignal<boolean>(false);
+
+  const [convertCoordinateForm, { Form, Field }] = createForm<ConvertCoordinateForm>({
+    initialValues: { coordinate: undefined, showTrailingZeros: false },
+  });
 
   const [coordinateText, setCoordinateText] = createSignal("No Coordinate Detected");
+
+  const CoordinateFormatArray: CoordinateFormat[] = ["D.D", "D M.M", "D M S.S", "MGRS"];
+
+  createEffect(() => {
+    setShowTrailingZeros(getValue(convertCoordinateForm, "showTrailingZeros")!);
+  });
 
   createEffect(() => {
     const newCoordinate = getValue(convertCoordinateForm, "coordinate");
@@ -58,19 +70,41 @@ const ConvertCoordinate: Component = () => {
           )}
         </Field>
         <p class="mt-2 ml-2 text-sm text-gray-500">{coordinateText()}</p>
-        <ul class="grid grid-cols-1 gap-5 mt-3 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          <CoordinateCard
-            title="Degrees Minutes Seconds"
-            subTitle={coordinate()?.degreesMinutesSecondsDecimalSeconds ?? ""}
-            // subTitle={"[" + (coordinate()?.lngLatArray.toString() ?? "") + "]"}
-          ></CoordinateCard>
-          <CoordinateCard
-            title="Degrees Minutes"
-            subTitle={coordinate()?.degreesMinutesDecimalMinutes ?? ""}
-          ></CoordinateCard>
-          <CoordinateCard title="Degrees" subTitle={coordinate()?.degreesDecimalDegrees ?? ""}></CoordinateCard>
-          <CoordinateCard title="MGRS" subTitle={coordinate()?.toFormat("MGRS") ?? ""}></CoordinateCard>
+        <ul class="grid grid-cols-1 gap-5 mt-3 md:gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <For each={CoordinateFormatArray}>
+            {(format) => (
+              <>
+                <CoordinateCard
+                  format={format}
+                  coordinate={coordinate()}
+                  showTrailingZeros={showTrailingZeros()}
+                ></CoordinateCard>
+              </>
+            )}
+          </For>
         </ul>
+        <div class="flex justify-between mt-4 items-start">
+          <Field name="showTrailingZeros" type="boolean">
+            {(field, props) => (
+              <Checkbox
+                {...props}
+                label="Show Trailing Zeros"
+                error={field.error}
+                checked={field.value ?? true}
+                required
+                class="mr-2"
+              ></Checkbox>
+            )}
+          </Field>
+          <div class="hidden md:block">
+            <p class="text-xs text-gray-500">
+              Changing coordinate formats can introduce rounding errors due to precision
+            </p>
+            <p class="text-xs text-gray-500">
+              D.DDDDDD=0.11m DM.MMMM=0.185m DMS.SS=0.308m MGRS=1m<sup>2</sup>
+            </p>
+          </div>
+        </div>
       </Form>
     </>
   );

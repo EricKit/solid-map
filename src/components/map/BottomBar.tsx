@@ -49,7 +49,7 @@ const BottomBar: Component<{ mouseCoordinate: Coordinate }> = (props) => {
      hover:bg-gray-700 focus:outline-none focus:bg-gray-700 focus:text-white transition duration-150 ease-in-out cursor-pointer w-36"
           >
             <span class="font-light text-gray-500 pr-3">MagVar</span>
-            <span class="font-medium text-gray-300">{roundAndTruncate(props.mouseCoordinate.magVar, 1, 1)}</span>
+            <span class="font-medium text-gray-300">{roundAndTruncate(props.mouseCoordinate.magVar, 1, 0, 1)}</span>
           </div>
         </div>
       </div>

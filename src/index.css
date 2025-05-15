@@ -21,6 +21,22 @@
   --font-sans: InterVariable, sans-serif;
 }
 
+.btn-icon {
+  @apply inline-flex items-center px-2 py-0 text-gray-900;
+}
+
+.btn-icon:hover {
+  @apply text-gray-600;
+}
+
+.btn-icon:focus {
+  @apply text-gray-600;
+}
+
+.btn-icon:active {
+  @apply text-gray-400;
+}
+
 body {
   margin: 0;
   font-family:

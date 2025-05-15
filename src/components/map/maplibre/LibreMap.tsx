@@ -1,12 +1,12 @@
 import { createSignal, onMount, type Component } from "solid-js";
 
-import { BottomBar } from "./map/BottomBar";
-import Coordinate from "../models/coordinate";
+import { BottomBar } from "../../map/BottomBar";
+import Coordinate from "../../../models/coordinate";
 import { Map as LibreMap, NavigationControl, StyleSpecification } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import mapStyle from "./map/styles/maptilersat.json";
-import { useSettings } from "../context/settings";
-import { copyToClipboard } from "../library/lib";
+import mapStyle from "../../map/styles/maptilersat.json";
+import { useSettings } from "../../../context/settings";
+import { copyToClipboard } from "../../../library/lib";
 
 const Map: Component = () => {
   const [mouseCoordinate, setMouseCoordinate] = createSignal<Coordinate>();
